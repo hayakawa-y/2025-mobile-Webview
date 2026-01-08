@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MyWebView(),
     );
   }
@@ -24,22 +25,85 @@ class MyWebView extends StatefulWidget {
 }
 
 class _MyWebViewState extends State<MyWebView> {
-  late final WebViewController _controller;
+  late WebViewController _controller;
 
   @override
   void initState() {
     super.initState();
 
     _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://flutter.dev'));
+  ..setJavaScriptMode(JavaScriptMode.unrestricted)
+  ..setNavigationDelegate(
+    NavigationDelegate(
+      onProgress: (int progress) {
+        print("Loading progress: $progress%");
+      },
+      onPageStarted: (String url) {
+        print("Page started loading: $url");
+      },
+      onPageFinished: (String url) {
+        print("Page finished loading: $url");
+      },
+      onNavigationRequest: (NavigationRequest request) {
+        if (request.url.startsWith("https://flutter.dev")) {
+          return NavigationDecision.navigate;
+        }
+        print("Blocked navigation to: ${request.url}");
+        return NavigationDecision.prevent;
+      },
+    ),
+  )
+  ..loadFlutterAsset("assets/index.html");
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WebView Example'),
+        title: Text("WebView Navigation & Events"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () async {
+              if (await _controller.canGoBack()) {
+                _controller.goBack();
+              }
+            },
+          ),
+
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: () async {
+              if (await _controller.canGoForward()) {
+                _controller.goForward();
+              }
+            },
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.code),
+            onPressed: () {
+               _controller.loadHtmlString('''
+                 <!DOCTYPE html>
+                  <html>
+                    <body>
+                      <h1>Hello from HTML String</h1>
+                      <p>This page is loaded from HTML String</p>
+                    </body>
+                </html>'''
+              );
+            },
+          ),
+
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              _controller.reload();
+            },
+          ),
+        ],
       ),
       body: WebViewWidget(
         controller: _controller,
