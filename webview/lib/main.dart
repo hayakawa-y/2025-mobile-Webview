@@ -88,12 +88,20 @@ class _MyWebViewState extends State<MyWebView> {
                _controller.loadHtmlString('''
                  <!DOCTYPE html>
                   <html>
-                    <body>
+                    <body>                     
                       <h1>Hello from HTML String</h1>
-                      <p>This page is loaded from HTML String</p>
+                      <p>This page is loaded dynamically from a String</p>
+                      <a href="https://flutter.dev" target="_blank">Go to Flutter Website</a>
                     </body>
                 </html>'''
               );
+            },
+          ),
+
+          IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () {
+               _controller.loadFlutterAsset('assets/index.html');
             },
           ),
 
