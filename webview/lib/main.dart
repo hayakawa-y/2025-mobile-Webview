@@ -26,6 +26,8 @@ class MyWebView extends StatefulWidget {
 
 class _MyWebViewState extends State<MyWebView> {
   late WebViewController _controller;
+  
+  
 
   @override
   void initState() {
@@ -79,29 +81,6 @@ class _MyWebViewState extends State<MyWebView> {
               if (await _controller.canGoForward()) {
                 _controller.goForward();
               }
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.code),
-            onPressed: () {
-               _controller.loadHtmlString('''
-                 <!DOCTYPE html>
-                  <html>
-                    <body>                     
-                      <h1>Hello from HTML String</h1>
-                      <p>This page is loaded dynamically from a String</p>
-                      <a href="https://flutter.dev" target="_blank">Go to Flutter Website</a>
-                    </body>
-                </html>'''
-              );
-            },
-          ),
-
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-               _controller.loadFlutterAsset('assets/index.html');
             },
           ),
 
