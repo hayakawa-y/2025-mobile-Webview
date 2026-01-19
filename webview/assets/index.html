@@ -1,34 +1,137 @@
+const String htmlContent = """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
-</head>
-<body>
-    <h1>My Cart</h1>
-    <p id="total">Total: $120</p>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Cart</title>
 
-    <button
-        style="
-            padding: 16px 32px;
-            font-size: 20px;
-            width: 100%;
-            border-radius: 14px;
-            border: 2px solid #ddd;
-            background-color: #f7f7f7;
-            color: #1e88e5;
-            cursor: pointer;
-        "
-        onclick="sendTotalToFlutter()">
-        Send Total to Flutter
-    </button>
-    
-    <script>
-        function sendTotalToFlutter(){
-            var totalPrice = document.getElementById('total').innerText;
-            FlutterChannel.postMessage(totalPrice);
-        }
-    </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+    }
+
+    h2, h3 {
+      margin-bottom: 10px;
+    }
+
+    .item {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .name { width: 80px; }
+    .price { width: 60px; text-align: center; }
+    .qty { width: 80px; text-align: center; }
+    .btn { width: 60px; text-align: right; }
+
+    button {
+      padding: 4px 10px;
+    }
+
+    /* Challenge 2 */
+    .retrieve {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>My Cart</h2>
+
+  <div class="item">
+    <div class="name">Apple</div>
+    <div class="price">100</div>
+    <div class="qty">Qty: <span id="qApple">0</span></div>
+    <div class="btn">
+      <button onclick="addItem('apple', 100)">Add</button>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="name">Banana</div>
+    <div class="price">50</div>
+    <div class="qty">Qty: <span id="qBanana">0</span></div>
+    <div class="btn">
+      <button onclick="addItem('banana', 50)">Add</button>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="name">Orange</div>
+    <div class="price">80</div>
+    <div class="qty">Qty: <span id="qOrange">0</span></div>
+    <div class="btn">
+      <button onclick="addItem('orange', 80)">Add</button>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="name">Grape</div>
+    <div class="price">120</div>
+    <div class="qty">Qty: <span id="qGrape">0</span></div>
+    <div class="btn">
+      <button onclick="addItem('grape', 120)">Add</button>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="name">Pineapple</div>
+    <div class="price">150</div>
+    <div class="qty">Qty: <span id="qPineapple">0</span></div>
+    <div class="btn">
+      <button onclick="addItem('pineapple', 150)">Add</button>
+    </div>
+  </div>
+
+  <h3>Cart</h3>
+  <p>Total: <span id="total">0</span></p>
+
+  <!-- Challenge 2 -->
+  <div class="retrieve">
+    Retrieve from JS: <span id="jsValue">0</span>
+  </div>
+
+  <script>
+    let total = 0;
+    let quantities = {
+      apple: 0,
+      banana: 0,
+      orange: 0,
+      grape: 0,
+      pineapple: 0
+    };
+
+    function addItem(name, price) {
+      quantities[name]++;
+      total += price;
+
+      document.getElementById("qApple").innerText = quantities.apple;
+      document.getElementById("qBanana").innerText = quantities.banana;
+      document.getElementById("qOrange").innerText = quantities.orange;
+      document.getElementById("qGrape").innerText = quantities.grape;
+      document.getElementById("qPineapple").innerText = quantities.pineapple;
+
+      document.getElementById("total").innerText = total;
+      document.getElementById("jsValue").innerText = total;
+
+      // Send to Flutter
+      FlutterChannel.postMessage(total.toString());
+    }
+
+    // Challenge 3
+    function updateTotalFromFlutter(value) {
+      document.getElementById("jsValue").innerText = value;
+    }
+  </script>
 </body>
 </html>
+""";
