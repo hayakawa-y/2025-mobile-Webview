@@ -8,107 +8,97 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MyWebView(),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 222, 108, 215))),
+      home: const MyHomePage(title: 'Webview JS Example'),
     );
   }
 }
 
-class MyWebView extends StatefulWidget {
-  const MyWebView({super.key});
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
 
   @override
-  State<MyWebView> createState() => _MyWebViewState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyWebViewState extends State<MyWebView> {
-  late WebViewController _controller;
+class _MyHomePageState extends State<MyHomePage> {
+late final WebViewController _controller;
+String totalFromJS = "";
 
-  bool _isLoading = false;
-
-  @override
+@override
   void initState() {
+    // TODO: implement initState
     super.initState();
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            print("Loading progress: $progress%");
-          },
-          onPageStarted: (String url) {
-            print("Page started loading: $url");
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            print("Page finished loading: $url");
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith("https://flutter.dev") ||
-                request.url.startsWith("https://docs.flutter.dev")) {
-              return NavigationDecision.navigate;
-            }
-            print("Blocked navigation to: ${request.url}");
-            return NavigationDecision.prevent;
-          },
-        ),
-      )
-      ..loadFlutterAsset("assets/index.html");
+      ..addJavaScriptChannel('FlutterChannel',onMessageReceived: (JavaScriptMessage message){
+        setState(() {
+          totalFromJS = message.message;
+        });
+      },)
+      ..loadHtmlString(htmlContent);
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("WebView Navigation & Events"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () async {
-              if (await _controller.canGoBack()) {
-                _controller.goBack();
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () async {
-              if (await _controller.canGoForward()) {
-                _controller.goForward();
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              _controller.reload();
-            },
-          ),
-        ],
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
       ),
-      body: Stack(
+      body: Center(child: Column(
         children: [
-          WebViewWidget(controller: _controller),
+          Expanded(child: WebViewWidget(controller:   _controller)),
+          Container(
+            padding: const EdgeInsets.all(12),
+            color: Colors.grey[200],
+            width: double.infinity,
+            child: Text("Receive from JS $totalFromJS",style: const TextStyle(fontSize: 18)),
+            
+          )
 
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.2),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
         ],
-      ),
+      )),
     );
   }
 }
+
+const String htmlContent = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+</head>
+<body>
+    <h1>My Cart
+    <p id="total">Total: \$120</p></h1>
+    <button style="
+            padding: 16px 32px;
+            font-size: 20px;
+            width: 100%;
+            border-radius: 14px;
+            border: 2px solid #ddd;
+            background-color: #f7f7f7;
+            color: #1e88e5;
+            cursor: pointer;"
+        onclick = "sendTotalToFlutter()">Send Total to Flutter</button>
+    
+        <script>
+            function sendTotalToFlutter(){
+                var totalPrice = document.getElementById('total').innerText;
+                FlutterChannel.postMessage(totalPrice);
+            }
+        </script>
+</body>
+</html>""";
