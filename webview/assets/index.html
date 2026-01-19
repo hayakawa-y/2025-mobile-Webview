@@ -1,4 +1,3 @@
-const String htmlContent = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,15 +5,6 @@ const String htmlContent = """
   <title>My Cart</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-    }
-
-    h2, h3 {
-      margin-bottom: 10px;
-    }
-
     .item {
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -26,79 +16,55 @@ const String htmlContent = """
       font-size: 14px;
     }
 
-    .name { width: 80px; }
-    .price { width: 60px; text-align: center; }
-    .qty { width: 80px; text-align: center; }
-    .btn { width: 60px; text-align: right; }
-
-    button {
-      padding: 4px 10px;
+    .item span {
+      margin: 0 5px;
     }
 
-    /* Challenge 2 */
-    .retrieve {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: bold;
+    .item button {
+      padding: 4px 10px;
     }
   </style>
 </head>
-
 <body>
   <h2>My Cart</h2>
 
   <div class="item">
-    <div class="name">Apple</div>
-    <div class="price">100</div>
-    <div class="qty">Qty: <span id="qApple">0</span></div>
-    <div class="btn">
-      <button onclick="addItem('apple', 100)">Add</button>
-    </div>
+    <span>Apple</span>
+    <span>100</span>
+    <span>Qty: <span id="qApple">0</span></span>
+    <button onclick="addItem('apple', 100)">Add</button>
   </div>
 
   <div class="item">
-    <div class="name">Banana</div>
-    <div class="price">50</div>
-    <div class="qty">Qty: <span id="qBanana">0</span></div>
-    <div class="btn">
-      <button onclick="addItem('banana', 50)">Add</button>
-    </div>
+    <span>Banana</span>
+    <span>50</span>
+    <span>Qty: <span id="qBanana">0</span></span>
+    <button onclick="addItem('banana', 50)">Add</button>
   </div>
 
   <div class="item">
-    <div class="name">Orange</div>
-    <div class="price">80</div>
-    <div class="qty">Qty: <span id="qOrange">0</span></div>
-    <div class="btn">
-      <button onclick="addItem('orange', 80)">Add</button>
-    </div>
+    <span>Orange</span>
+    <span>80</span>
+    <span>Qty: <span id="qOrange">0</span></span>
+    <button onclick="addItem('orange', 80)">Add</button>
   </div>
 
   <div class="item">
-    <div class="name">Grape</div>
-    <div class="price">120</div>
-    <div class="qty">Qty: <span id="qGrape">0</span></div>
-    <div class="btn">
-      <button onclick="addItem('grape', 120)">Add</button>
-    </div>
+    <span>Grape</span>
+    <span>120</span>
+    <span>Qty: <span id="qGrape">0</span></span>
+    <button onclick="addItem('grape', 120)">Add</button>
   </div>
 
   <div class="item">
-    <div class="name">Pineapple</div>
-    <div class="price">150</div>
-    <div class="qty">Qty: <span id="qPineapple">0</span></div>
-    <div class="btn">
-      <button onclick="addItem('pineapple', 150)">Add</button>
-    </div>
+    <span>Pineapple</span>
+    <span>150</span>
+    <span>Qty: <span id="qPineapple">0</span></span>
+    <button onclick="addItem('pineapple', 150)">Add</button>
   </div>
 
   <h3>Cart</h3>
   <p>Total: <span id="total">0</span></p>
-
-  <!-- Challenge 2 -->
-  <div class="retrieve">
-    Retrieve from JS: <span id="jsValue">0</span>
-  </div>
 
   <script>
     let total = 0;
@@ -121,15 +87,15 @@ const String htmlContent = """
       document.getElementById("qPineapple").innerText = quantities.pineapple;
 
       document.getElementById("total").innerText = total;
-      document.getElementById("jsValue").innerText = total;
 
-      // Send to Flutter
+      // Challenge 2
       FlutterChannel.postMessage(total.toString());
     }
 
     // Challenge 3
-    function updateTotalFromFlutter(value) {
-      document.getElementById("jsValue").innerText = value;
+    function updateTotalFromFlutter(newTotal) {
+      total = newTotal;
+      document.getElementById("total").innerText = total;
     }
   </script>
 </body>
