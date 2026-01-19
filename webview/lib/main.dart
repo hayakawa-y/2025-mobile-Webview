@@ -74,18 +74,17 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Challenge 2
-                Center(
-                child: Text(
+                Text(
                   "Retrieve from JS",
                   style: const TextStyle(fontSize: 18),
                 ),
-                ),
+                
                 const SizedBox(height: 10),
 
                 // Challenge 3
                 ElevatedButton(
                   onPressed: _sendBackToJS,
-                  child: const Text("plus 100 updateTotalFromFlutter to Flutter to JS"),
+                  child: const Text("send +100 Total From Flutter to JS"),
                 ),
               ],
             ),
