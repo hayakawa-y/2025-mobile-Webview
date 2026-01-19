@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 222, 108, 215))),
-      home: const MyHomePage(title: 'Webview JS Example'),
+      home: const MyHomePage(title: 'Flutter to JS'),
     );
   }
 }
@@ -29,8 +29,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-late final WebViewController _controller;
-String totalFromJS = "";
+
+  late final WebViewController _controller;
 
 @override
   void initState() {
@@ -39,66 +39,44 @@ String totalFromJS = "";
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..addJavaScriptChannel('FlutterChannel',onMessageReceived: (JavaScriptMessage message){
-        setState(() {
-          totalFromJS = message.message;
-        });
-      },)
       ..loadHtmlString(htmlContent);
-    
+  }
+
+  Future<void> _sendMessage() async{
+    await _controller.runJavaScript("showMessageFromFlutter('Hello From Flutter')");
+    final result = await _controller.runJavaScriptReturningResult("showMessageFromFlutter('Hello From Flutter with return value')");
+    debugPrint("JS return: $result");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,title: Text(widget.title),
+       actions: [IconButton(onPressed: _sendMessage, icon: Icon(Icons.send))],
       ),
-      body: Center(child: Column(
-        children: [
-          Expanded(child: WebViewWidget(controller:   _controller)),
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: Colors.grey[200],
-            width: double.infinity,
-            child: Text("Receive from JS $totalFromJS",style: const TextStyle(fontSize: 18)),
-            
-          )
-
-        ],
-      )),
+      body: WebViewWidget(controller: _controller),
     );
   }
 }
 
 const String htmlContent = """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
+  <title>JS from Flutter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <h1>My Cart
-    <p id="total">Total: \$120</p></h1>
-    <button style="
-            padding: 16px 32px;
-            font-size: 20px;
-            width: 100%;
-            border-radius: 14px;
-            border: 2px solid #ddd;
-            background-color: #f7f7f7;
-            color: #1e88e5;
-            cursor: pointer;"
-        onclick = "sendTotalToFlutter()">Send Total to Flutter</button>
-    
-        <script>
-            function sendTotalToFlutter(){
-                var totalPrice = document.getElementById('total').innerText;
-                FlutterChannel.postMessage(totalPrice);
-            }
-        </script>
+  <h1>Web Page</h1>
+  <p id="msg">No message yet</p>
+
+  <script>
+    function showMessageFromFlutter(msg) {
+      document.getElementById('msg').innerText = "Flutter says: " + msg;
+      return "Message received: " + msg;
+    }
+  </script>
 </body>
-</html>""";
+</html>
+""";
